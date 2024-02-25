@@ -3,16 +3,30 @@ package main
 import (
 	"bwastartup/handler"
 	"bwastartup/user"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-func main() {
+func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
-	dsn := "shendy:D4rkL0l12.@tcp(127.0.0.1:3306)/bwastartup?charset=utf8mb4&parseTime=True&loc=Local"
+	log.Println("env success")
+}
+
+func main() {
+	dbUsername := os.Getenv("DATABASE_USERNAME")
+	dbPassword := os.Getenv("DATABASE_PASSWORD")
+
+	dsn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/bwastartup?charset=utf8mb4&parseTime=True&loc=Local", dbUsername, dbPassword)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
