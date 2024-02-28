@@ -12,17 +12,17 @@ import (
 )
 
 type campaignHandler struct {
-	campaignService campaign.Service
+	service campaign.Service
 }
 
-func NewCampaignHandler(campaignService campaign.Service) *campaignHandler {
-	return &campaignHandler{campaignService}
+func NewCampaignHandler(service campaign.Service) *campaignHandler {
+	return &campaignHandler{service}
 }
 
 func (h *campaignHandler) GetCampaigns(c *gin.Context) {
 	userID, _ := strconv.Atoi(c.Query("user_id"))
 
-	campaigns, err := h.campaignService.GetCampaigns(userID)
+	campaigns, err := h.service.GetCampaigns(userID)
 	formatter := campaign.FormatCampaigns(campaigns)
 	if err != nil {
 		response := helper.APIResponse("Failed to get campaign", http.StatusBadRequest, "error", nil)
@@ -43,7 +43,7 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 		return
 	}
 
-	campaignDetail, err := h.campaignService.GetCampaignByID(input)
+	campaignDetail, err := h.service.GetCampaignByID(input)
 	formatter := campaign.FormatCampaignDetail(campaignDetail)
 	if err != nil {
 		response := helper.APIResponse("Failed to get detail of campaign", http.StatusBadRequest, "error", nil)
@@ -70,7 +70,7 @@ func (h *campaignHandler) CreateCampaign(c *gin.Context) {
 
 	input.User = currentUser
 
-	newCampaign, err := h.campaignService.CreateCampaign(input)
+	newCampaign, err := h.service.CreateCampaign(input)
 	if err != nil {
 		response := helper.APIResponse("Failed to create campaign", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -105,7 +105,7 @@ func (h *campaignHandler) UpdateCampaign(c *gin.Context) {
 
 	inputData.User = currentUser
 
-	updatedCampaign, err := h.campaignService.UpdateCampaign(inputID, inputData)
+	updatedCampaign, err := h.service.UpdateCampaign(inputID, inputData)
 	if err != nil {
 		response := helper.APIResponse("Failed to update campaign", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -148,7 +148,7 @@ func (h *campaignHandler) UploadCampaignImage(c *gin.Context) {
 
 	path := fmt.Sprintf("campaign-images/%d-%s", userID, file.Filename)
 
-	_, err = h.campaignService.CreateCampaignImage(input, path)
+	_, err = h.service.CreateCampaignImage(input, path)
 	if err != nil {
 		data := gin.H{
 			"is_uploaded": false,
